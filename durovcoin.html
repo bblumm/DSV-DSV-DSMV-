@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>#FREEDUROV </title>
+    <style>
+        @font-face {
+            font-family: 'JuneGull';
+            src: url('junegull.ttf') format('truetype');
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            background-image: url('loa.webp');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: rgb(255, 187, 0);
+            font-family: 'JuneGull', sans-serif;
+            position: relative;
+        }
+
+        #durov {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    cursor: pointer;
+    transition: transform 0.2s;
+    position: relative;
+    z-index: 1;
+    user-select: none; /* Убирает выделение */
+    outline: none; /* Убирает обводку при фокусе */
+    -webkit-touch-callout: none; /* Убирает меню при длительном нажатии на iOS */
+    -webkit-user-drag: none; /* Убирает возможность перетаскивания на iOS */
+}
+
+
+        #durov:active {
+            transform: scale(0.9);
+        }
+
+        #counter {
+            margin-top: 20px;
+            font-size: 24px;
+        }
+
+        .baget {
+            position: absolute;
+            display: none;
+            width: 50px;
+            height: 50px;
+            animation: fall 1s forwards;
+        }
+        
+
+        @keyframes fall {
+            0% { transform: translateY(0); opacity: 1; }
+            70% { transform: translateY(100px); }
+            100% { opacity: 0; }
+        }
+
+        #progressContainer {
+            width: 100%;
+            background-color: rgb(237,237,237);
+            height: 25px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 40px;
+            position: relative;
+            z-index: 1;
+        }
+
+        #progressBar {
+            width: 0%;
+            height: 100%;
+            background-color: rgb(249,195,110);
+        }
+
+        .control-panel {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            background-color: #ededed;
+            padding: 10px;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            z-index: 1;
+        }
+
+        .control-button {
+            background-color: transparent;
+            border: none;
+            border-radius: 10px;
+            padding: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 70px;
+            height: 90px;
+        }
+
+        .control-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .control-button img {
+            width: 40px;
+            height: 40px;
+        }
+
+        .control-button-text {
+            font-size: 12px;
+            font-family: "JuneGull";
+            text-align: center;
+            color: black;
+        }
+
+        .task-title,
+        .task-count {
+            color: white;
+        }
+
+        .resHotka {
+            position: absolute;
+            display: none;
+            width: 600px;
+            top: 0; 
+            z-index: 2;
+        }
+
+        /* Новый стиль для раздела с задним фоном */
+        #backgroundSection {
+            display: none; /* Скрыт по умолчанию */
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('loa.webp') no-repeat center center;
+            background-size: cover;
+            z-index: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="counter"><span id="clickCount">0</span></div> 
+    <img src="durov1.png" alt="Durov" id="durov"> 
+    <div id="progressContainer">
+        <div id="progressBar"></div>
+    </div>
+
+    <div id="backgroundSection"></div> <!-- Новый раздел для заднего фона -->
+    
+    <script>
+        let clickCount = Number(localStorage.getItem('clickCount')) || 0; 
+        const clickCounterDisplay = document.getElementById('clickCount');
+        const progressBar = document.getElementById('progressBar');
+        const durov = document.getElementById('durov');
+        const backgroundSection = document.getElementById('backgroundSection');
+
+        // Обновляем значение отображаемого счетчика
+        clickCounterDisplay.textContent = clickCount;
+        updateProgressBar(); // Обновляем прогресс бар
+
+        durov.addEventListener('click', function(event) {
+            clickCount++;
+            clickCounterDisplay.textContent = clickCount;
+            localStorage.setItem('clickCount', clickCount); // Сохраняем клики в localStorage
+            updateProgressBar();
+
+            // Эффект "багета"
+            const baget = document.createElement('img');
+            baget.src = 'baget.png'; 
+            baget.alt = 'Baget';
+            baget.className = 'baget'; 
+
+            const rect = durov.getBoundingClientRect();
+            const x = event.clientX - rect.left; 
+            const y = event.clientY - rect.top; 
+
+            baget.style.left = x + 'px'; 
+            baget.style.top = y + 'px'; 
+            document.body.appendChild(baget);
+
+            setTimeout(function() {
+                baget.style.display = 'block'; 
+            }, 0);
+
+            setTimeout(function() {
+                document.body.removeChild(baget);
+            }, 1500);
+        });
+
+        function updateProgressBar() {
+            const progressPercentage = Math.min((clickCount * 1000) / 1000 * 100, 100); 
+            progressBar.style.width = progressPercentage + '%';
+        }
+
+        function resetProgressBar() {
+            clickCount = 0; 
+            clickCounterDisplay.textContent = clickCount; 
+            progressBar.style.width = '0%'; 
+            localStorage.removeItem('clickCount'); // Удаляем данные из хранилища
+        }
+
+        function showResHotka() {
+            const reshotka = document.createElement('img');
+            reshotka.src = 'reshotka.png'; 
+            reshotka.alt = 'Reshotka';
+            reshotka.className = 'resHotka'; 
+            reshotka.style.display = 'block'; 
+
+            document.body.appendChild(reshotka);
+        }
+
+        const prfButton = document.querySelector(".control-button:last-child");
+        prfButton.addEventListener('click', function() {
+            console.log("Кнопка ПРФ нажата.");
+            clickCounterDisplay.style.display = 'none';
+            durov.style.display = 'none';
+            document.getElementById('progressContainer').style.display = 'none';
+            showResHotka();
+            backgroundSection.style.display = 'block';
+        });
+    </script>
+
+    <div class="control-panel">
+        <button class="control-button">
+            <img src="сука.svg" alt="Icon 1">
+            <div class="control-button-text">Будет позже</div>
+        </button>
+        <button class="control-button">
+            <img src="icon2.png" alt="Icon 2">
+            <div class="control-button-text">Париз</div>
+        </button>
+        <button class="control-button">
+            <img src="icon3.png" alt="Icon 3">
+            <div class="control-button-text">Будет позже</div>
+        </button>
+    </div>
+
+</body>
+</html>
